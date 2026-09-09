@@ -40,7 +40,7 @@ echo ""
 
 # Check SSH connection
 echo -e "${BOLD}[1/4] Checking connection to reMarkable tablet...${RESET}"
-if ! ssh -o ConnectTimeout=5 -o BatchMode=yes "${SSH_TARGET}" "true" 2>/dev/null; then
+if ! ssh -n -o ConnectTimeout=5 -o BatchMode=yes "${SSH_TARGET}" "true" 2>/dev/null; then
     echo -e "${YELLOW}ERROR: Unable to connect to ${SSH_TARGET} via SSH.${RESET}"
     echo "Please ensure your tablet is connected via USB or Wi-Fi and SSH keys are setup."
     echo "Usage: ./install.sh [device-ip] [-y|--yes]"
@@ -50,7 +50,7 @@ echo -e "      ${GREEN}Connected successfully!${RESET}"
 
 # Check if qt-resource-rebuilder directory exists
 echo -e "${BOLD}[2/4] Verifying XOVI / qt-resource-rebuilder setup...${RESET}"
-if ! ssh "${SSH_TARGET}" "[ -d ${REMOTE_DEST} ]"; then
+if ! ssh -n "${SSH_TARGET}" "[ -d ${REMOTE_DEST} ]"; then
     echo -e "${YELLOW}ERROR: ${REMOTE_DEST} does not exist on the device.${RESET}"
     echo "Please make sure XOVI and qt-resource-rebuilder are installed first."
     echo "See README.md for prerequisites."
@@ -147,7 +147,7 @@ if [ "$INSTALL_GLOBAL" = true ]; then
 fi
 
 # Clean up previous GhostBuster extensions on device so unselected modules are removed
-ssh "${SSH_TARGET}" "rm -f ${REMOTE_DEST}/ghostbuster-*.qmd"
+ssh -n "${SSH_TARGET}" "rm -f ${REMOTE_DEST}/ghostbuster-*.qmd"
 
 if [ "$SELECTED_COUNT" -gt 0 ]; then
     scp "${TEMP_DEPLOY}"/*.qmd "${SSH_TARGET}:${REMOTE_DEST}/"
@@ -158,7 +158,7 @@ fi
 
 # Restart xochitl
 echo -e "${BOLD}[4/4] Restarting xochitl...${RESET}"
-ssh "${SSH_TARGET}" "/home/root/xovi/start"
+ssh -n "${SSH_TARGET}" "/home/root/xovi/start"
 echo -e "      ${GREEN}xochitl restarted!${RESET}"
 
 echo ""
