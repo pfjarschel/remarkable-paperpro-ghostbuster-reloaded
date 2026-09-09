@@ -36,7 +36,7 @@ Because many users bought their devices second-hand or live in countries where r
 | **Page Turns & Hyperlinks** | **Recommended** (Default: Yes) | Asynchronous-aware refresh: waits until new page tiles finish rendering before clearing on page flips, fast scrolling, and link jumps. |
 | **Settings Menu** | **Recommended** (Default: Yes) | Debounces the refresh by 400ms when opening and closing Settings so views completely paint before refreshing. |
 | **Stylus Eraser** | Optional (Default: No) | Triggers a full refresh ~400ms after you lift the eraser. Great if your panel exhibits heavy ghosting specifically after erasing strokes. |
-| **5-Finger Gesture** | Optional (Default: No) | Re-enables reMarkable's built-in 5-finger screen tap gesture inside documents for an on-demand manual hardware clear. |
+| **5-Finger Gesture** | Optional (Default: No) | Enables a system-wide 5-finger screen tap gesture anywhere (Library, Documents, Settings) for an immediate manual hardware clear without interfering with single-finger touch. |
 
 > **Why are only Page and Settings recommended by default?**  
 > For most users, page navigation and settings transitions represent 99% of ghosting triggers. Keeping the eraser module optional preserves maximum snappiness during rapid note-taking, and the 5-finger gesture is rarely needed once automated clears are running.

@@ -1,10 +1,18 @@
 ; ghostbuster-global.qmd
-; Enable 5-finger screen clear gesture inside Documents
+; Enable system-wide 5-finger screen clear gesture (Library, Documents, Settings)
 
-AFFECT /qml/device/view/documentview/SceneViewGestures.qml
-    TRAVERSE TouchArea > TouchAreaClickFilter#ghostbusterFilter
-        REPLACE enabled WITH {
-            enabled: !PenClosenessMonitor.penWasClose
+AFFECT /qt/qml/xofm/modules/gestures/global/qml/GesturesWindow.qml
+    TRAVERSE BaseView#root
+        LOCATE AFTER ALL
+        INSERT {
+            TouchAreaClickFilter {
+                objectName: "global-5finger-ghostbuster"
+                touchArea: root.touchArea
+                fingers: 5
+                onClick: {
+                    EPFramebuffer.clearGhosting();
+                }
+            }
         }
     END TRAVERSE
 END AFFECT

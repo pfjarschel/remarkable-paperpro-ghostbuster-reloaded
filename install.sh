@@ -108,10 +108,10 @@ else
     echo ""
 
     # 4. Global 5-finger gesture
-    echo -e "${BOLD}4. 5-Finger Force Clear Gesture${RESET}"
-    echo -e "   Re-enables the built-in 5-finger screen tap gesture inside documents"
-    echo -e "   for a manual hardware clear. Not usually needed with auto-clears,"
-    echo -e "   but available if you want an on-demand clear gesture."
+    echo -e "${BOLD}4. System-Wide 5-Finger Force Clear Gesture${RESET}"
+    echo -e "   Enables a 5-finger screen tap gesture anywhere (Library, Documents,"
+    echo -e "   Settings) for an immediate full hardware clear without breaking touch."
+    echo -e "   Not usually needed with auto-clears, but great as an on-demand fallback."
     echo -e "   ${DIM}(Optional - default disabled)${RESET}"
     read -rp "   Install 5-Finger Gesture module? [y/N]: " ans_global
     if [[ "$ans_global" =~ ^[Yy]$ ]]; then
