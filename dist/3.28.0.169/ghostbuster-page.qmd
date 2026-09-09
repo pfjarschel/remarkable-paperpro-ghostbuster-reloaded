@@ -1,21 +1,42 @@
 ; ghostbuster-page.qmd
 ; Automatically clear ghosting on page turns, link clicks, dialog closes, and toolbar toggles
+; Optimized with single settle timer and cooldown rate-limiting to prevent double refreshes
 
 AFFECT [[1224665461898798997]]
     TRAVERSE [[8397993708429497603]]#[[6504254477]]
         LOCATE AFTER ALL
         INSERT {
             property ~&6503679477&~ pageRefreshPending: ~&214625660372&~
+            property ~&7082585429636&~ lastFullClearTime: 0
+
+            function triggerSafePageClear(~&7083120765809&~) {
+                ~&197102514&~ now = ~&6502586279&~.now();
+                ~&5972376&~ (now - lastFullClearTime < 1200) {
+                    ~&7083121450889&~;
+                }
+                lastFullClearTime = now;
+                ~&482865290967253827&~.~&8021204117616398611&~(~&7083120765809&~);
+            }
+
+            function onPageTurn() {
+                pageRefreshPending = ~&6504329801&~;
+                ~&5972376&~ (!~&6504254477&~.~&254534022647302435&~) {
+                    pageTurnGhostBusterTimer.~&7713147298280334&~ = 350;
+                    pageTurnGhostBusterTimer.~&233743006639214&~();
+                } ~&6503784146&~ {
+                    pageTurnGhostBusterTimer.~&6504295855&~();
+                }
+            }
 
             ~&214604601930&~ {
                 ~&5972374&~: pageTurnGhostBusterTimer
-                ~&7713147298280334&~: 450
+                ~&7713147298280334&~: 350
                 ~&7083121289162&~: ~&214625660372&~
                 ~&495358363329399331&~: {
                     ~&5972376&~ (~&6504254477&~.pageRefreshPending) {
                         ~&5972376&~ (!~&6504254477&~.~&254534022647302435&~) {
                             ~&6504254477&~.pageRefreshPending = ~&214625660372&~;
-                            ~&482865290967253827&~.~&8021204117616398611&~("Page change");
+                            triggerSafePageClear("Page change");
                         } ~&6503784146&~ {
                             pageTurnGhostBusterTimer.~&7713147298280334&~ = 150;
                             pageTurnGhostBusterTimer.~&233743006639214&~();
@@ -24,33 +45,26 @@ AFFECT [[1224665461898798997]]
                 }
             }
 
-            ~&214604601930&~ {
-                ~&5972374&~: pageSettleTimer
-                ~&7713147298280334&~: 150
-                ~&7083121289162&~: ~&214625660372&~
-                ~&495358363329399331&~: {
-                    ~&5972376&~ (~&6504254477&~.pageRefreshPending) {
-                        ~&6504254477&~.pageRefreshPending = ~&214625660372&~;
-                        ~&482865290967253827&~.~&8021204117616398611&~("Page change");
-                    }
-                }
-            }
-
             ~&428051690305612204&~ {
                 ~&7083194890448&~: ~&6504254477&~
                 function onIsLoadingChanged() {
-                    ~&5972376&~ (!~&6504254477&~.~&254534022647302435&~ && ~&6504254477&~.pageRefreshPending) {
-                        pageSettleTimer.~&233743006639214&~();
+                    ~&5972376&~ (~&6504254477&~.pageRefreshPending) {
+                        ~&5972376&~ (~&6504254477&~.~&254534022647302435&~) {
+                            pageTurnGhostBusterTimer.~&6504295855&~();
+                        } ~&6503784146&~ {
+                            pageTurnGhostBusterTimer.~&7713147298280334&~ = 250;
+                            pageTurnGhostBusterTimer.~&233743006639214&~();
+                        }
                     }
                 }
             }
 
             ~&214604601930&~ {
                 ~&5972374&~: dialogGhostBusterTimer
-                ~&7713147298280334&~: 150
+                ~&7713147298280334&~: 200
                 ~&7083121289162&~: ~&214625660372&~
                 ~&495358363329399331&~: {
-                    ~&482865290967253827&~.~&8021204117616398611&~("UI close");
+                    triggerSafePageClear("UI close");
                 }
             }
 
@@ -66,7 +80,7 @@ AFFECT [[1224665461898798997]]
         }
 
         REBUILD [[2104365313657427216]]
-            LOCATE AFTER STREAM \~&16435552976362715847&~.~&233743006639214&~();\ INSERT STREAM \ pageRefreshPending = ~&6504329801&~; pageTurnGhostBusterTimer.~&7713147298280334&~ = 450; pageTurnGhostBusterTimer.~&233743006639214&~();\
+            LOCATE AFTER STREAM \~&16435552976362715847&~.~&233743006639214&~();\ INSERT STREAM \ onPageTurn();\
         END REBUILD
 
         REPLACE [[9859199064309061864]] WITH {
@@ -81,3 +95,4 @@ AFFECT [[1224665461898798997]]
         }
     END TRAVERSE
 END AFFECT
+

@@ -1,21 +1,42 @@
 ; ghostbuster-page.qmd
 ; Automatically clear ghosting on page turns, link clicks, dialog closes, and toolbar toggles
+; Optimized with single settle timer and cooldown rate-limiting to prevent double refreshes
 
 AFFECT /qml/device/view/documentview/DocumentView.qml
     TRAVERSE FocusScope#root
         LOCATE AFTER ALL
         INSERT {
             property bool pageRefreshPending: false
+            property double lastFullClearTime: 0
+
+            function triggerSafePageClear(reason) {
+                var now = Date.now();
+                if (now - lastFullClearTime < 1200) {
+                    return;
+                }
+                lastFullClearTime = now;
+                ghostBuster.forceClearNow(reason);
+            }
+
+            function onPageTurn() {
+                pageRefreshPending = true;
+                if (!root.isLoading) {
+                    pageTurnGhostBusterTimer.interval = 350;
+                    pageTurnGhostBusterTimer.restart();
+                } else {
+                    pageTurnGhostBusterTimer.stop();
+                }
+            }
 
             Timer {
                 id: pageTurnGhostBusterTimer
-                interval: 450
+                interval: 350
                 repeat: false
                 onTriggered: {
                     if (root.pageRefreshPending) {
                         if (!root.isLoading) {
                             root.pageRefreshPending = false;
-                            ghostBuster.forceClearNow("Page change");
+                            triggerSafePageClear("Page change");
                         } else {
                             pageTurnGhostBusterTimer.interval = 150;
                             pageTurnGhostBusterTimer.restart();
@@ -24,33 +45,26 @@ AFFECT /qml/device/view/documentview/DocumentView.qml
                 }
             }
 
-            Timer {
-                id: pageSettleTimer
-                interval: 150
-                repeat: false
-                onTriggered: {
-                    if (root.pageRefreshPending) {
-                        root.pageRefreshPending = false;
-                        ghostBuster.forceClearNow("Page change");
-                    }
-                }
-            }
-
             Connections {
                 target: root
                 function onIsLoadingChanged() {
-                    if (!root.isLoading && root.pageRefreshPending) {
-                        pageSettleTimer.restart();
+                    if (root.pageRefreshPending) {
+                        if (root.isLoading) {
+                            pageTurnGhostBusterTimer.stop();
+                        } else {
+                            pageTurnGhostBusterTimer.interval = 250;
+                            pageTurnGhostBusterTimer.restart();
+                        }
                     }
                 }
             }
 
             Timer {
                 id: dialogGhostBusterTimer
-                interval: 150
+                interval: 200
                 repeat: false
                 onTriggered: {
-                    ghostBuster.forceClearNow("UI close");
+                    triggerSafePageClear("UI close");
                 }
             }
 
@@ -66,7 +80,7 @@ AFFECT /qml/device/view/documentview/DocumentView.qml
         }
 
         REBUILD onCurrentPageChanged
-            LOCATE AFTER STREAM \pageLabelTimer.restart();\ INSERT STREAM \ pageRefreshPending = true; pageTurnGhostBusterTimer.interval = 450; pageTurnGhostBusterTimer.restart();\
+            LOCATE AFTER STREAM \pageLabelTimer.restart();\ INSERT STREAM \ onPageTurn();\
         END REBUILD
 
         REPLACE handleDialogGhosting WITH {
@@ -81,3 +95,4 @@ AFFECT /qml/device/view/documentview/DocumentView.qml
         }
     END TRAVERSE
 END AFFECT
+
