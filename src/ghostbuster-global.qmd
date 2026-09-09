@@ -1,0 +1,10 @@
+; ghostbuster-global.qmd
+; Enable 5-finger screen clear gesture inside Documents
+
+AFFECT /qml/device/view/documentview/SceneViewGestures.qml
+    TRAVERSE TouchArea > TouchAreaClickFilter#ghostbusterFilter
+        REPLACE enabled WITH {
+            enabled: !PenClosenessMonitor.penWasClose
+        }
+    END TRAVERSE
+END AFFECT

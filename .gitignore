@@ -1,0 +1,19 @@
+# Binaries and extracted firmware assets (proprietary / copyright)
+bin/
+extracted_qml/
+qml_test/
+existing_qmd/
+
+# Build tools and cache
+tools/
+extract_all_rcc.py
+
+# Temporary deployment directory
+deploy/
+
+# OS and Editor files
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/

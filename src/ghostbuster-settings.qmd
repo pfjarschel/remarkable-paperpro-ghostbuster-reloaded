@@ -1,0 +1,66 @@
+; ghostbuster-settings.qmd
+; Delay ghost busting when opening and closing Settings so the destination view finishes rendering before the refresh
+
+AFFECT /qml/device/view/settings/Settings.qml
+    TRAVERSE Item#root
+        LOCATE AFTER ALL
+        INSERT {
+            Timer {
+                id: settingsOpenedTimer
+                interval: 400
+                repeat: false
+                onTriggered: {
+                    ghostBuster.forceClearNow("Settings opened");
+                }
+            }
+        }
+
+        REPLACE onOpened WITH {
+            function onOpened(configuration) {
+                settingsOpenedTimer.restart();
+
+                root.windowNavigator.open("retail/window/retail-restricted", {
+                    accept: () => {},
+                    reject: () => { root.close() }
+                });
+
+                const {action, index} = configuration;
+                if (action && action === "showSubscription") {
+                    contentItem.showSubscription();
+                    return;
+                }
+                if (action && action === "showCloudSettings") {
+                    _selectedPage = SettingsModel.SettingsPage.Cloud;
+                    return;
+                }
+
+                _selectedPage = index ?? SettingsModel.SettingsPage.General;
+            }
+        }
+    END TRAVERSE
+END AFFECT
+
+AFFECT /qt/qml/xofm/modules/settings/qml/SettingsWindow.qml
+    IMPORT QtQuick 2.0
+    TRAVERSE BaseView#root
+        LOCATE AFTER ALL
+        INSERT {
+            Timer {
+                id: settingsClosedGhostTimer
+                interval: 400
+                repeat: false
+                onTriggered: {
+                    ghostBuster.forceClearNow("Settings closed");
+                }
+            }
+        }
+
+        REPLACE onVisibleChanged WITH {
+            onVisibleChanged: {
+                if (!visible) {
+                    settingsClosedGhostTimer.restart();
+                }
+            }
+        }
+    END TRAVERSE
+END AFFECT

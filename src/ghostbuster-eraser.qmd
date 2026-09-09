@@ -1,0 +1,32 @@
+; ghostbuster-eraser.qmd
+; Automatically clear ghosting when erasing with the stylus
+
+AFFECT /qml/device/view/documentview/DeviceSceneView.qml
+    TRAVERSE FocusScope#root
+        LOCATE AFTER ALL
+        INSERT {
+            property var ghostBuster: root.parent?.ghostBuster ?? null
+
+            Timer {
+                id: eraserGhostBusterTimer
+                interval: 400
+                repeat: false
+                onTriggered: {
+                    let gb = (typeof root.ghostBuster !== "undefined" && root.ghostBuster) ? root.ghostBuster : root.parent?.ghostBuster;
+                    if (gb) {
+                        gb.forceClearNow("Eraser");
+                    } else {
+                        EPFramebuffer.scheduleGhostRemoval();
+                    }
+                    root.viewport?.requestRepaintDirty();
+                }
+            }
+        }
+    END TRAVERSE
+
+    TRAVERSE FocusScope#root > ScenePenInputHandler#strokeHandler
+        REBUILD onStrokeCompleted
+            LOCATE AFTER STREAM \controller.eraseWithLine(stroke);\ INSERT STREAM \ eraserGhostBusterTimer.restart();\
+        END REBUILD
+    END TRAVERSE
+END AFFECT

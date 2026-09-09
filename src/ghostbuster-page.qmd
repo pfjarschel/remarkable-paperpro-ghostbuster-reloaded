@@ -1,0 +1,83 @@
+; ghostbuster-page.qmd
+; Automatically clear ghosting on page turns, link clicks, dialog closes, and toolbar toggles
+
+AFFECT /qml/device/view/documentview/DocumentView.qml
+    TRAVERSE FocusScope#root
+        LOCATE AFTER ALL
+        INSERT {
+            property bool pageRefreshPending: false
+
+            Timer {
+                id: pageTurnGhostBusterTimer
+                interval: 450
+                repeat: false
+                onTriggered: {
+                    if (root.pageRefreshPending) {
+                        if (!root.isLoading) {
+                            root.pageRefreshPending = false;
+                            ghostBuster.forceClearNow("Page change");
+                        } else {
+                            pageTurnGhostBusterTimer.interval = 150;
+                            pageTurnGhostBusterTimer.restart();
+                        }
+                    }
+                }
+            }
+
+            Timer {
+                id: pageSettleTimer
+                interval: 150
+                repeat: false
+                onTriggered: {
+                    if (root.pageRefreshPending) {
+                        root.pageRefreshPending = false;
+                        ghostBuster.forceClearNow("Page change");
+                    }
+                }
+            }
+
+            Connections {
+                target: root
+                function onIsLoadingChanged() {
+                    if (!root.isLoading && root.pageRefreshPending) {
+                        pageSettleTimer.restart();
+                    }
+                }
+            }
+
+            Timer {
+                id: dialogGhostBusterTimer
+                interval: 150
+                repeat: false
+                onTriggered: {
+                    ghostBuster.forceClearNow("UI close");
+                }
+            }
+
+            Connections {
+                target: toolbar
+                function onShownChanged() {
+                    dialogGhostBusterTimer.restart();
+                }
+                function onExpandedChanged() {
+                    dialogGhostBusterTimer.restart();
+                }
+            }
+        }
+
+        REBUILD onCurrentPageChanged
+            LOCATE AFTER STREAM \pageLabelTimer.restart();\ INSERT STREAM \ pageRefreshPending = true; pageTurnGhostBusterTimer.interval = 450; pageTurnGhostBusterTimer.restart();\
+        END REBUILD
+
+        REPLACE handleDialogGhosting WITH {
+            function handleDialogGhosting(isVisible) {
+                if (isVisible) {
+                    ghostBuster.viewChange(GhostBuster.DocumentViewDialogOpened);
+                } else {
+                    ghostBuster.viewChange(GhostBuster.DocumentViewDialogClosed);
+                    dialogGhostBusterTimer.restart();
+                }
+            }
+        }
+    END TRAVERSE
+END AFFECT
