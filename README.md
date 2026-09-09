@@ -9,12 +9,12 @@
 Early manufacturing batches of the **reMarkable Paper Pro** featured first-generation E Ink Gallery 3 (AceP 2) color panels. While these panels worked well at launch, recent firmware updates introduced aggressive partial refresh strategies to make the UI feel "snappier."
 
 For newer hardware revisions with updated display characteristics, this works fine. But on earlier hardware, frequent partial refreshes leave behind **severe green and black ghosting artifacts** across the screen when:
-* Erasing handwritten strokes with the Marker / Marker Plus
 * Turning pages or navigating hyperlinks in PDFs and notebooks
 * Opening and closing the Settings menu
+* Erasing handwritten strokes with the Marker / Marker Plus
 * Navigating between views
 
-Because many users bought their devices second-hand or live in countries where reMarkable does not offer warranty replacements, many users were left with severely compromised devices.
+Because many users bought their devices second-hand or live in countries where reMarkable does not offer warranty replacements, many were left with severely compromised devices.
 
 ---
 
@@ -24,30 +24,28 @@ Because many users bought their devices second-hand or live in countries where r
 
 * **Zero pen latency impact**: Drawing and writing speed are 100% untouched.
 * **100% Non-invasive & Safe**: Lives completely in userland memory (`/home/root/xovi/`). **Never modifies read-only rootfs partitions or system binaries**.
-* **Completely reversible**: Uninstalling is as simple as deleting the `.qmd` files and restarting `xochitl`.
+* **Completely reversible**: Uninstalling is as simple as running `./uninstall.sh`.
+* **Modular Design**: Choose only the modules you want.
 
 ---
 
-## ✨ Features
+## 🧩 Modules Overview
 
-1. **🧹 Immediate Stylus Eraser Auto-Clear**
-   * Automatically triggers a full waveform refresh ~400ms after you lift the eraser.
-   * Works with the eraser tool in the toolbar and the back eraser of the Marker Plus.
-2. **📖 Smart Page Turn & Hyperlink Clear**
-   * Listens to the asynchronous document tile rendering engine (`isLoading`).
-   * When you flip pages or click heavy PDF hyperlinks, it waits until all destination tiles are completely drawn before clearing—preventing premature refresh flashes.
-3. **⚙️ Settings Menu Debounced Clear**
-   * Debounces the screen clear by 400ms when opening and closing Settings, giving the UI time to paint before refreshing.
-4. **🖐️ 5-Finger Document Force Clear Gesture**
-   * Re-enables reMarkable's native 5-finger screen tap gesture inside documents for a manual hardware clear whenever you want one.
-5. **👆 Completely Unobstructed Touch**
-   * Library, folders, books, sidebar menus, and bezel swipe gestures remain completely natural and responsive.
+| Module | Status | Description |
+| :--- | :--- | :--- |
+| **Page Turns & Hyperlinks** | **Recommended** (Default: Yes) | Asynchronous-aware refresh: waits until new page tiles finish rendering before clearing on page flips, fast scrolling, and link jumps. |
+| **Settings Menu** | **Recommended** (Default: Yes) | Debounces the refresh by 400ms when opening and closing Settings so views completely paint before refreshing. |
+| **Stylus Eraser** | Optional (Default: No) | Triggers a full refresh ~400ms after you lift the eraser. Great if your panel exhibits heavy ghosting specifically after erasing strokes. |
+| **5-Finger Gesture** | Optional (Default: No) | Re-enables reMarkable's built-in 5-finger screen tap gesture inside documents for an on-demand manual hardware clear. |
+
+> **Why are only Page and Settings recommended by default?**  
+> For most users, page navigation and settings transitions represent 99% of ghosting triggers. Keeping the eraser module optional preserves maximum snappiness during rapid note-taking, and the 5-finger gesture is rarely needed once automated clears are running.
 
 ---
 
 ## 📋 Prerequisites
 
-1. A **reMarkable Paper Pro** running firmware `3.28.x` (tested and confirmed on `3.28.0.169`).
+1. A **reMarkable Paper Pro** running firmware `3.28.x` (tested on `3.28.0.169`).
 2. SSH access enabled on your tablet (via USB or Wi-Fi).
 3. **[XOVI](https://github.com/asivery/xovi)** and **qt-resource-rebuilder** installed on the device.
 
@@ -55,42 +53,34 @@ Because many users bought their devices second-hand or live in countries where r
 
 ## 🚀 Quick Start (Installation)
 
-### Automatic Installation
-
-Connect your Paper Pro via USB (or Wi-Fi), clone this repository, and run:
+Connect your Paper Pro via USB (or Wi-Fi), clone this repository, and run the interactive installer:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/remarkable-paper-pro-ghostbuster.git
-cd remarkable-paper-pro-ghostbuster
+git clone https://github.com/pfjarschel/remarkable-paperpro-ghostbuster-reloaded.git
+cd remarkable-paperpro-ghostbuster-reloaded
 ./install.sh
 ```
 
-*(Optional: pass device IP if connecting over Wi-Fi: `./install.sh 192.168.1.xxx`)*
+The installer will guide you through each module and allow you to toggle them.
 
-### Manual Installation
+### Automated / Non-interactive Install
 
-If you prefer copying manually:
+To install the recommended defaults (Page + Settings) automatically without prompts:
 
 ```bash
-# Copy pre-hashed diffs to qt-resource-rebuilder
-scp dist/3.28.0.169/*.qmd root@10.11.99.1:/home/root/xovi/exthome/qt-resource-rebuilder/
-
-# Restart xochitl via XOVI
-ssh root@10.11.99.1 "/home/root/xovi/start"
+./install.sh -y
 ```
+
+*(Optional: pass device IP if connecting over Wi-Fi: `./install.sh 192.168.1.xxx`)*
 
 ---
 
 ## 🗑️ Uninstallation
 
-Run:
+To remove all GhostBuster modules and restore stock behavior:
+
 ```bash
 ./uninstall.sh
-```
-
-Or manually delete the extensions from the device:
-```bash
-ssh root@10.11.99.1 "rm -f /home/root/xovi/exthome/qt-resource-rebuilder/ghostbuster-*.qmd && /home/root/xovi/start"
 ```
 
 ---

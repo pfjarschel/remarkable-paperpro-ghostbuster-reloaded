@@ -17,3 +17,5 @@ deploy/
 *~
 .idea/
 .vscode/
+*.kate-swp
+.*.swp
