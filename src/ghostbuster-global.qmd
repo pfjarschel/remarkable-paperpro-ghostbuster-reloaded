@@ -2,6 +2,7 @@
 ; Enable system-wide 5-finger screen clear gesture (Library, Documents, Settings)
 
 AFFECT /qt/qml/xofm/modules/gestures/global/qml/GesturesWindow.qml
+    IMPORT com.remarkable 1.0
     TRAVERSE BaseView#root
         LOCATE AFTER ALL
         INSERT {
