@@ -75,8 +75,8 @@ if [ "$AUTO_YES" = true ]; then
 else
     # 1. Page module
     echo -e "${BOLD}1. Page Turns & Navigation Auto-Clear${RESET}"
-    echo -e "   Waits until new page tiles finish loading before refreshing on"
-    echo -e "   page turns, fast scrolling, and hyperlink jumps."
+    echo -e "   Waits until views finish rendering before refreshing on page turns,"
+    echo -e "   hyperlink jumps, and library folder navigation."
     echo -e "   ${GREEN}(Recommended)${RESET}"
     read -rp "   Install Page Turn module? [Y/n]: " ans_page
     if [[ "$ans_page" =~ ^[Nn]$ ]]; then
@@ -86,8 +86,8 @@ else
 
     # 2. Settings module
     echo -e "${BOLD}2. Settings Menu Auto-Clear${RESET}"
-    echo -e "   Debounces the refresh by 400ms when opening and closing Settings"
-    echo -e "   so the destination view finishes painting before the refresh fires."
+    echo -e "   Debounces the refresh by 400ms when opening and closing device"
+    echo -e "   Settings and document settings (PDF/notebook/ebook)."
     echo -e "   ${GREEN}(Recommended)${RESET}"
     read -rp "   Install Settings module? [Y/n]: " ans_settings
     if [[ "$ans_settings" =~ ^[Nn]$ ]]; then
@@ -166,8 +166,8 @@ echo -e "${BOLD}${CYAN}======================================================${R
 echo -e "${BOLD}${GREEN}  Installation Complete! 🎉${RESET}"
 echo -e "${BOLD}${CYAN}======================================================${RESET}"
 echo "Active configuration:"
-[ "$INSTALL_PAGE" = true ]     && echo -e "  ${GREEN}✔${RESET} Page Turns & Hyperlink Navigation"
-[ "$INSTALL_SETTINGS" = true ] && echo -e "  ${GREEN}✔${RESET} Settings Menu Open & Close"
+[ "$INSTALL_PAGE" = true ]     && echo -e "  ${GREEN}✔${RESET} Page Turns & Folder Navigation"
+[ "$INSTALL_SETTINGS" = true ] && echo -e "  ${GREEN}✔${RESET} Device & Document Settings Open & Close"
 [ "$INSTALL_ERASER" = true ]   && echo -e "  ${GREEN}✔${RESET} Stylus Eraser Auto-Clear"
 [ "$INSTALL_GLOBAL" = true ]   && echo -e "  ${GREEN}✔${RESET} 5-Finger Force Clear Gesture"
 [ "$SELECTED_COUNT" -eq 0 ]    && echo -e "  ${YELLOW}(All modules disabled / stock behavior)${RESET}"

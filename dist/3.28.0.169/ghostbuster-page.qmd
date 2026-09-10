@@ -1,6 +1,7 @@
 ; ghostbuster-page.qmd
-; Automatically clear ghosting on page turns, link clicks, dialog closes, and toolbar toggles
-; Optimized with single settle timer and cooldown rate-limiting to prevent double refreshes
+; Automatically clear ghosting on page turns, link clicks, dialog closes, toolbar toggles,
+; and library (home) screen folder navigation
+; Optimized with settle timers and cooldown rate-limiting to prevent double refreshes
 
 AFFECT [[1224665461898798997]]
     TRAVERSE [[8397993708429497603]]#[[6504254477]]
@@ -95,4 +96,68 @@ AFFECT [[1224665461898798997]]
         }
     END TRAVERSE
 END AFFECT
+
+AFFECT [[8850026134298937527]]
+    IMPORT [[233700934949963]] 2.0
+    IMPORT [[197082280.8400022150001312063]] 1.0
+    TRAVERSE [[8397993708429497603]]#[[6504254477]]
+        LOCATE AFTER ALL
+        INSERT {
+            property ~&6503679477&~ isInitialized: ~&214625660372&~
+            property ~&7082585429636&~ lastFolderClearTime: 0
+
+            ~&254480451320573660&~.~&495334332051582499&~: {
+                ~&6504254477&~.isInitialized = ~&6504329801&~;
+            }
+
+            function triggerSafeFolderClear() {
+                ~&197102514&~ now = ~&6502586279&~.now();
+                ~&5972376&~ (now - lastFolderClearTime < 1000) {
+                    ~&7083121450889&~;
+                }
+                lastFolderClearTime = now;
+                ~&6687579895491175043&~.clearGhosting();
+            }
+
+            ~&214604601930&~ {
+                ~&5972374&~: folderNavGhostTimer
+                ~&7713147298280334&~: 400
+                ~&7083121289162&~: ~&214625660372&~
+                ~&495358363329399331&~: {
+                    ~&5972376&~ (~&6504254477&~.~&233748328658231&~ && ~&6504254477&~.isInitialized) {
+                        triggerSafeFolderClear();
+                    }
+                }
+            }
+
+            ~&428051690305612204&~ {
+                ~&7083194890448&~: ~&6504254477&~.~&7712989590835962&~
+                function onCurrentFolderIdChanged() {
+                    ~&5972376&~ (~&6504254477&~.~&233748328658231&~ && ~&6504254477&~.isInitialized) {
+                        folderNavGhostTimer.~&233743006639214&~();
+                    }
+                }
+            }
+
+            ~&428051690305612204&~ {
+                ~&7083194890448&~: ~&7712727139026210&~
+                function ~&4910590129138652423&~() {
+                    ~&5972376&~ (~&6504254477&~.~&233748328658231&~ && ~&6504254477&~.isInitialized) {
+                        folderNavGhostTimer.~&233743006639214&~();
+                    }
+                }
+            }
+
+            ~&428051690305612204&~ {
+                ~&7083194890448&~: ~&6504254477&~
+                function ~&13733777459642361598&~() {
+                    ~&5972376&~ (~&6504254477&~.~&233748328658231&~ && ~&6504254477&~.isInitialized) {
+                        folderNavGhostTimer.~&233743006639214&~();
+                    }
+                }
+            }
+        }
+    END TRAVERSE
+END AFFECT
+
 

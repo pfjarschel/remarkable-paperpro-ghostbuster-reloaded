@@ -1,5 +1,6 @@
 ; ghostbuster-settings.qmd
-; Delay ghost busting when opening and closing Settings so the destination view finishes rendering before the refresh
+; Delay ghost busting when opening and closing device Settings and document settings (PDF/notebook/ebook)
+; so the destination view finishes rendering before the refresh
 
 AFFECT [[12599552112012170435]]
     TRAVERSE [[6502786168]]#[[6504254477]]
@@ -64,3 +65,37 @@ AFFECT [[7063364796741787792]]
         }
     END TRAVERSE
 END AFFECT
+
+AFFECT [[6259312930654360789]]
+    IMPORT [[233700934949963]] 2.0
+    IMPORT [[197082280.8400022150001312063]] 1.0
+    TRAVERSE [[7711468349764991]]#[[6504254477]]
+        LOCATE AFTER ALL
+        INSERT {
+            property ~&6503679477&~ wasOpened: ~&214625660372&~
+
+            ~&214604601930&~ {
+                ~&5972374&~: editDocClosedGhostTimer
+                ~&7713147298280334&~: 400
+                ~&7083121289162&~: ~&214625660372&~
+                ~&495358363329399331&~: {
+                    ~&6687579895491175043&~.clearGhosting();
+                }
+            }
+        }
+
+        REBUILD [[7713401573498017]]
+            LOCATE BEFORE STREAM \~&214622607920&~ { ~&8399386052748489877&~ } = ~&6503646550&~;\ INSERT STREAM \ ~&6504254477&~.wasOpened = ~&6504329801&~;\
+        END REBUILD
+
+        INSERT {
+            ~&13733777459642361598&~: {
+                ~&5972376&~ (!~&233748328658231&~ && ~&6504254477&~.wasOpened) {
+                    ~&6504254477&~.wasOpened = ~&214625660372&~;
+                    editDocClosedGhostTimer.~&233743006639214&~();
+                }
+            }
+        }
+    END TRAVERSE
+END AFFECT
+

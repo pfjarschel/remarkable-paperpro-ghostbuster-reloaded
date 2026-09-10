@@ -33,8 +33,8 @@ Because many users bought their devices second-hand or live in countries where r
 
 | Module | Status | Description |
 | :--- | :--- | :--- |
-| **Page Turns & Hyperlinks** | **Recommended** (Default: Yes) | Asynchronous-aware refresh: waits until new page tiles finish rendering before clearing on page flips, fast scrolling, and link jumps. |
-| **Settings Menu** | **Recommended** (Default: Yes) | Debounces the refresh by 400ms when opening and closing Settings so views completely paint before refreshing. |
+| **Page Turns & Navigation** | **Recommended** (Default: Yes) | Asynchronous-aware refresh: waits until views finish rendering before clearing on page flips, fast scrolling, link jumps, and library folder navigation. |
+| **Settings Menu** | **Recommended** (Default: Yes) | Debounces the refresh by 400ms when opening and closing device Settings and document settings (PDF/notebook/ebook) so views completely paint before refreshing. |
 | **Stylus Eraser** | Optional (Default: No) | Triggers a full refresh ~400ms after you lift the eraser. Great if your panel exhibits heavy ghosting specifically after erasing strokes. |
 | **5-Finger Gesture** | Optional (Default: No) | Enables a system-wide 5-finger screen tap gesture anywhere (Library, Documents, Settings) for an immediate manual hardware clear without interfering with single-finger touch. |
 

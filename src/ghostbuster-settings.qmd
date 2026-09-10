@@ -1,5 +1,6 @@
 ; ghostbuster-settings.qmd
-; Delay ghost busting when opening and closing Settings so the destination view finishes rendering before the refresh
+; Delay ghost busting when opening and closing device Settings and document settings (PDF/notebook/ebook)
+; so the destination view finishes rendering before the refresh
 
 AFFECT /qml/device/view/settings/Settings.qml
     TRAVERSE Item#root
@@ -64,3 +65,37 @@ AFFECT /qt/qml/xofm/modules/settings/qml/SettingsWindow.qml
         }
     END TRAVERSE
 END AFFECT
+
+AFFECT /qt/qml/xofm/modules/library/ui/qml/EditDocumentWindow.qml
+    IMPORT QtQuick 2.0
+    IMPORT com.remarkable 1.0
+    TRAVERSE BaseView#root
+        LOCATE AFTER ALL
+        INSERT {
+            property bool wasOpened: false
+
+            Timer {
+                id: editDocClosedGhostTimer
+                interval: 400
+                repeat: false
+                onTriggered: {
+                    EPFramebuffer.clearGhosting();
+                }
+            }
+        }
+
+        REBUILD onOpened
+            LOCATE BEFORE STREAM \const { documentId } = args;\ INSERT STREAM \ root.wasOpened = true;\
+        END REBUILD
+
+        INSERT {
+            onVisibleChanged: {
+                if (!visible && root.wasOpened) {
+                    root.wasOpened = false;
+                    editDocClosedGhostTimer.restart();
+                }
+            }
+        }
+    END TRAVERSE
+END AFFECT
+

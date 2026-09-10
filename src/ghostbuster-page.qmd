@@ -1,6 +1,7 @@
 ; ghostbuster-page.qmd
-; Automatically clear ghosting on page turns, link clicks, dialog closes, and toolbar toggles
-; Optimized with single settle timer and cooldown rate-limiting to prevent double refreshes
+; Automatically clear ghosting on page turns, link clicks, dialog closes, toolbar toggles,
+; and library (home) screen folder navigation
+; Optimized with settle timers and cooldown rate-limiting to prevent double refreshes
 
 AFFECT /qml/device/view/documentview/DocumentView.qml
     TRAVERSE FocusScope#root
@@ -95,4 +96,68 @@ AFFECT /qml/device/view/documentview/DocumentView.qml
         }
     END TRAVERSE
 END AFFECT
+
+AFFECT /qml/device/view/navigator/Navigator.qml
+    IMPORT QtQuick 2.0
+    IMPORT com.remarkable 1.0
+    TRAVERSE FocusScope#root
+        LOCATE AFTER ALL
+        INSERT {
+            property bool isInitialized: false
+            property double lastFolderClearTime: 0
+
+            Component.onCompleted: {
+                root.isInitialized = true;
+            }
+
+            function triggerSafeFolderClear() {
+                var now = Date.now();
+                if (now - lastFolderClearTime < 1000) {
+                    return;
+                }
+                lastFolderClearTime = now;
+                EPFramebuffer.clearGhosting();
+            }
+
+            Timer {
+                id: folderNavGhostTimer
+                interval: 400
+                repeat: false
+                onTriggered: {
+                    if (root.visible && root.isInitialized) {
+                        triggerSafeFolderClear();
+                    }
+                }
+            }
+
+            Connections {
+                target: root.explorer
+                function onCurrentFolderIdChanged() {
+                    if (root.visible && root.isInitialized) {
+                        folderNavGhostTimer.restart();
+                    }
+                }
+            }
+
+            Connections {
+                target: _sidebar
+                function onActiveViewChanged() {
+                    if (root.visible && root.isInitialized) {
+                        folderNavGhostTimer.restart();
+                    }
+                }
+            }
+
+            Connections {
+                target: root
+                function onVisibleChanged() {
+                    if (root.visible && root.isInitialized) {
+                        folderNavGhostTimer.restart();
+                    }
+                }
+            }
+        }
+    END TRAVERSE
+END AFFECT
+
 
