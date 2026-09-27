@@ -98,7 +98,6 @@ AFFECT /qml/device/view/documentview/DocumentView.qml
 END AFFECT
 
 AFFECT /qml/device/view/navigator/Navigator.qml
-    IMPORT QtQuick 2.0
     IMPORT com.remarkable 1.0
     TRAVERSE FocusScope#root
         LOCATE AFTER ALL

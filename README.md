@@ -45,7 +45,7 @@ Because many users bought their devices second-hand or live in countries where r
 
 ## 📋 Prerequisites
 
-1. A **reMarkable Paper Pro** running firmware `3.28.x` (tested on `3.28.0.169`).
+1. A **reMarkable Paper Pro** running firmware `3.28.0.169` or `3.29.0.148` (the installer rejects other versions rather than applying mismatched patches).
 2. SSH access enabled on your tablet (via USB or Wi-Fi).
 3. **[XOVI](https://github.com/asivery/xovi)** and **qt-resource-rebuilder** installed on the device.
 
@@ -61,7 +61,7 @@ cd remarkable-paperpro-ghostbuster-reloaded
 ./install.sh
 ```
 
-The installer will guide you through each module and allow you to toggle them.
+The installer selects the patches for the tablet's exact firmware version and guides you through each module. It requires key-based SSH access; with password-only SSH, copy the matching files from `dist/<firmware>/` to `/home/root/xovi/exthome/qt-resource-rebuilder/` and run `/home/root/xovi/start`.
 
 ### Automated / Non-interactive Install
 
@@ -87,7 +87,7 @@ To remove all GhostBuster modules and restore stock behavior:
 
 ## 🛠️ Building & Porting to Newer Firmware
 
-The human-readable source diffs are located in `src/`. To compile/hash them for different firmware versions:
+The human-readable source diffs are located in `src/` (updated for 3.29; the 3.28 builds remain in `dist/3.28.0.169/`). Do not force `QtQuick 2.0` into the 3.29 patches: it hides `Connections.enabled` and breaks Navigator QML. To compile/hash for another firmware version:
 
 1. Extract the firmware's `hashtab` using `qmldiff` or copy `/home/root/xovi/exthome/qt-resource-rebuilder/hashtab` from your tablet.
 2. Install [`qmldiff`](https://github.com/asivery/qmldiff).

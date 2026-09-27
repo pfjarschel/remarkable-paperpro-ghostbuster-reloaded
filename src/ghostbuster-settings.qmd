@@ -42,7 +42,6 @@ AFFECT /qml/device/view/settings/Settings.qml
 END AFFECT
 
 AFFECT /qt/qml/xofm/modules/settings/qml/SettingsWindow.qml
-    IMPORT QtQuick 2.0
     TRAVERSE BaseView#root
         LOCATE AFTER ALL
         INSERT {
@@ -67,7 +66,6 @@ AFFECT /qt/qml/xofm/modules/settings/qml/SettingsWindow.qml
 END AFFECT
 
 AFFECT /qt/qml/xofm/modules/library/ui/qml/EditDocumentWindow.qml
-    IMPORT QtQuick 2.0
     IMPORT com.remarkable 1.0
     TRAVERSE BaseView#root
         LOCATE AFTER ALL

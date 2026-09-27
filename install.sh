@@ -30,7 +30,6 @@ TARGET_USER="root"
 SSH_TARGET="${TARGET_USER}@${TARGET_IP}"
 REMOTE_DEST="/home/root/xovi/exthome/qt-resource-rebuilder"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DIST_DIR="${SCRIPT_DIR}/dist/3.28.0.169"
 
 echo -e "${BOLD}${CYAN}======================================================${RESET}"
 echo -e "${BOLD}${CYAN}   reMarkable Paper Pro - GhostBuster Installer       ${RESET}"
@@ -47,6 +46,13 @@ if ! ssh -n -o ConnectTimeout=5 -o BatchMode=yes "${SSH_TARGET}" "true" 2>/dev/n
     exit 1
 fi
 echo -e "      ${GREEN}Connected successfully!${RESET}"
+
+FIRMWARE="$(ssh -n "${SSH_TARGET}" '. /etc/os-release; printf "%s" "$IMG_VERSION"')"
+case "$FIRMWARE" in
+    3.28.0.169|3.29.0.148) DIST_DIR="${SCRIPT_DIR}/dist/${FIRMWARE}" ;;
+    *) echo "ERROR: Firmware ${FIRMWARE:-unknown} is not supported. No files changed."; exit 1 ;;
+esac
+echo "Firmware: ${FIRMWARE}"
 
 # Check if qt-resource-rebuilder directory exists
 echo -e "${BOLD}[2/4] Verifying XOVI / qt-resource-rebuilder setup...${RESET}"
